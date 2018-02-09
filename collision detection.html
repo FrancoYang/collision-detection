@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>碰撞检测</title>
+	<style>
+		#div1{
+			width: 100px;
+			height: 100px;
+			background: red;
+			position: absolute;
+			z-index:2;
+
+		}
+		#img1{
+			position: absolute;
+			width: 200px;
+			height: 200px;
+			left:600px;
+			top:300px;
+		}
+	</style>
+</head>
+<body>
+	12345678
+	<div id="div1"></div>
+	<img src="xiyangyang.jpg" alt="" id="img1">
+<script>
+	var oDiv1=document.getElementById("div1");
+	var oImg1=document.getElementById("img1");
+	
+	//封装拖拽方法
+	function drag(obj){
+		obj.onmousedown=function(ev){
+		//先用鼠标当前的距离ev.clientX减去这个div到屏幕左边的距离offsetLeft,求出鼠标到div左边距的距离disX，以后每次把鼠标距离屏幕左侧的距离ev.clientX减去这个距离disX，即是div到最左边的距离left
+		var disX=ev.clientX-this.offsetLeft;
+		var disY=ev.clientY-this.offsetTop;
+
+		//这里用到了全局捕获，一方面是某些浏览器下无法阻止默认行为，因此要捕获其他元素的拖拽行为，另一方面也避免了有多个div时，div重叠时发生的选取问题。
+		if(obj.setCapture){
+			obj.setCapture();
+		}
+		document.onmousemove=function(ev){
+			var ev=ev||event;
+			var L=ev.clientX-disX;
+			var T=ev.clientY-disY;
+
+		//碰撞检测：用div的4个边与图片的4个边进行距离比较
+			var L1=L;
+			var R1=L+obj.offsetWidth;
+			var T1=T;
+			var B1=T+obj.offsetHeight;
+
+			var L2=oImg1.offsetLeft;
+			var R2=L2+oImg1.offsetWidth;
+			var T2=oImg1.offsetTop;
+			var B2=T2+oImg1.offsetHeight;
+
+			if(R1<L2||B1<T2||L1>R2||T1>B2){
+				oImg1.src="xiyangyang.jpg";
+			}else{
+				oImg1.src="xiaohuihui.jpg";
+			}
+
+			//这个例子是规则图形，如果是不规则图形怎么检测？用最外侧突出的点来检测？
+
+			obj.style.left=L+'px';
+			obj.style.top=T+'px';
+		}
+		document.onmouseup=function(){
+			document.onmousemove=document.onmouseup=null;
+			//当鼠标抬起时清空移动时的函数
+
+			//当鼠标抬起其，释放捕获
+			if(obj.releaseCapture){
+				obj.releaseCapture();
+			}
+		}
+
+		return false;
+		//拖拽时，当鼠标按下后，如果页面中有文字被选中，则会触发浏览器默认的拖拽文字的效果，会和拖拽div起冲突，因此这里要阻止默认行为。
+	}
+
+	}
+
+	//使用拖拽方法
+	drag(oDiv1);
+	drag(oImg1);
+</script>	
+</body>
+</html>
